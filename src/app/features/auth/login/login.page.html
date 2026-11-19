@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Iniciar sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <ion-list>
+      <ion-input
+        formControlName="email"
+        type="email"
+        label="Correo"
+        labelPlacement="floating"
+        fill="outline"
+        autocomplete="email"
+        errorText="Ingresa un correo válido"
+      ></ion-input>
+
+      <ion-input
+        formControlName="password"
+        type="password"
+        label="Contraseña"
+        labelPlacement="floating"
+        fill="outline"
+        autocomplete="current-password"
+        errorText="La contraseña es obligatoria"
+        class="ion-margin-top"
+      ></ion-input>
+    </ion-list>
+
+    @if (error()) {
+      <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+    }
+
+    <ion-button expand="block" type="submit" [disabled]="loading()" class="ion-margin-top">
+      @if (loading()) { <ion-spinner name="crescent"></ion-spinner> } @else { Entrar }
+    </ion-button>
+  </form>
+
+  <ion-button expand="block" fill="outline" (click)="loginWithGoogle()" [disabled]="loading()">
+    Continuar con Google
+  </ion-button>
+
+  <p class="ion-text-center">
+    <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a><br />
+    ¿No tienes cuenta? <a routerLink="/register">Regístrate</a>
+  </p>
+</ion-content>

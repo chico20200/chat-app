@@ -1,12 +1,20 @@
-import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { IonButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent],
 })
 export class HomePage {
-  constructor() {}
+  protected readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  async logout(): Promise<void> {
+    await this.authService.logout();
+    await this.router.navigateByUrl('/login', { replaceUrl: true });
+  }
 }

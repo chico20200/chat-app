@@ -9,4 +9,8 @@
 
 <ion-content class="ion-padding">
   <p>Sesión iniciada como <strong>{{ authService.user()?.email }}</strong></p>
+
+  <p>UID de Firebase: <code>{{ authService.user()?.uid }}</code></p>      <!-- PRUEBA -->
+<ion-button (click)="whoami()">¿Quién soy para Supabase?</ion-button>     <!-- PRUEBA -->
+<pre>{{ claims() }}</pre>                                                  <!-- PRUEBA -->
 </ion-content>

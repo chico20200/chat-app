@@ -13,6 +13,10 @@ export const environment = {
     appId: "",
     measurementId: ""
   },
+  supabase: {
+    url: '',
+    publishableKey: '',
+  },
 };
 
 /*

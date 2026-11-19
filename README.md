@@ -1,5 +1,7 @@
 # Chat EPN — Aplicación de chat con Firebase y Supabase
 
+### Video demostración celular: https://vt.tiktok.com/ZSpcgCSD5/
+
 Aplicación de mensajería multiplataforma (web y Android) construida con **Ionic + Angular** que integra **Firebase** y **Supabase al mismo tiempo**, aprovechando lo mejor de cada servicio: Firebase gestiona la identidad y los mensajes en tiempo real; Supabase gestiona los datos relacionales, los archivos y la presencia de usuarios.
 
 | | |

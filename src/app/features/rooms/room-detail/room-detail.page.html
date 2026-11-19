@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/rooms"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ room()?.name ?? 'Sala' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (loading()) {
+    <div class="ion-text-center"><ion-spinner></ion-spinner></div>
+  } @else if (room(); as r) {
+    <ion-badge [color]="r.is_private ? 'medium' : 'success'">{{ r.is_private ? 'Privada' : 'Pública' }}</ion-badge>
+    @if (r.description) { <p>{{ r.description }}</p> }
+
+    <div class="ion-margin-vertical">
+      @if (!isMember() && !r.is_private) {
+        <ion-button expand="block" (click)="join()" [disabled]="busy()">Unirme</ion-button>
+      }
+      @if (isOwner() && r.type === 'group') {
+        <ion-button expand="block" fill="outline" (click)="showCandidates()" [disabled]="busy()">
+          Agregar miembro
+        </ion-button>
+      }
+      @if (isMember() && r.type === 'group') {
+        <ion-button expand="block" fill="clear" color="danger" (click)="leave()" [disabled]="busy()">
+          Salir de la sala
+        </ion-button>
+      }
+    </div>
+
+    @if (candidates(); as list) {
+      <ion-list>
+        <ion-list-header>Elige a quién agregar</ion-list-header>
+        @for (p of list; track p.id) {
+          <ion-item button (click)="add(p.id)" [disabled]="busy()">
+            <app-avatar slot="start" [src]="p.avatar_url" [name]="p.display_name" [size]="36" />
+            <ion-label>{{ p.display_name }}</ion-label>
+          </ion-item>
+        } @empty {
+          <ion-item lines="none"><ion-label color="medium">Todos ya son miembros.</ion-label></ion-item>
+        }
+      </ion-list>
+    }
+
+    <ion-list>
+      <ion-list-header>Miembros ({{ members().length }})</ion-list-header>
+      @for (m of members(); track m.user_id) {
+        <ion-item>
+          <app-avatar slot="start" [src]="m.profile?.avatar_url ?? null" [name]="m.profile?.display_name ?? '?'" [size]="36" />
+          <ion-label>{{ m.profile?.display_name ?? 'Usuario' }}</ion-label>
+          @if (m.role === 'owner') { <ion-note slot="end">Dueño</ion-note> }
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  @if (error()) {
+    <ion-text color="danger"><p>{{ error() }}</p></ion-text>
+  }
+</ion-content>

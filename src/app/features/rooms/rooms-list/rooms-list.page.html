@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Salas</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="tab()" (ionChange)="onTabChange($event.detail.value)">
+      <ion-segment-button value="mine"><ion-label>Mis salas</ion-label></ion-segment-button>
+      <ion-segment-button value="explore"><ion-label>Explorar</ion-label></ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (loading()) {
+    <div class="ion-text-center ion-padding"><ion-spinner></ion-spinner></div>
+  }
+  @if (error()) {
+    <ion-text color="danger"><p class="ion-padding">{{ error() }}</p></ion-text>
+  }
+
+  @let rooms = tab() === 'mine' ? roomService.myRooms() : publicRooms();
+
+  <ion-list>
+    @for (room of rooms; track room.id) {
+      <ion-item [routerLink]="['/rooms', room.id]" detail>
+        <ion-label>
+          <h2>{{ room.name ?? 'Chat directo' }}</h2>
+          @if (room.description) { <p>{{ room.description }}</p> }
+        </ion-label>
+        <ion-badge slot="end" [color]="room.is_private ? 'medium' : 'success'">
+          {{ room.is_private ? 'Privada' : 'Pública' }}
+        </ion-badge>
+      </ion-item>
+    } @empty {
+      @if (!loading()) {
+        <ion-item lines="none">
+          <ion-label class="ion-text-center" color="medium">
+            {{ tab() === 'mine' ? 'Aún no perteneces a ninguna sala.' : 'No hay salas públicas nuevas.' }}
+          </ion-label>
+        </ion-item>
+      }
+    }
+  </ion-list>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button routerLink="/rooms/new" aria-label="Crear sala">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

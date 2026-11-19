@@ -8,9 +8,13 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <p>Sesión iniciada como <strong>{{ authService.user()?.email }}</strong></p>
-
-  <p>UID de Firebase: <code>{{ authService.user()?.uid }}</code></p>      <!-- PRUEBA -->
-<ion-button (click)="whoami()">¿Quién soy para Supabase?</ion-button>     <!-- PRUEBA -->
-<pre>{{ claims() }}</pre>                                                  <!-- PRUEBA -->
+  @if (profileService.myProfile(); as profile) {
+    <div class="ion-text-center">
+      <app-avatar [src]="profile.avatar_url" [name]="profile.display_name" [size]="72" />
+      <p>Hola, <strong>{{ profile.display_name }}</strong></p>
+      <p><small>{{ authService.user()?.email }}</small></p>
+      <ion-button routerLink="/rooms">Salas</ion-button>
+      <ion-button routerLink="/profile" fill="outline">Mi perfil</ion-button>                                              <!-- PRUEBA -->
+    </div>
+  }
 </ion-content>

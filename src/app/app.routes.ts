@@ -27,5 +27,31 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
 
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile.page').then((m) => m.ProfilePage),
+  },
+
+  
+  {
+    path: 'profile',
+    loadComponent: () => import('./features/profile/profile.page').then((m) => m.ProfilePage),
+  },
+   {
+    path: 'rooms',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/rooms/rooms-list/rooms-list.page').then((m) => m.RoomsListPage),
+  },
+  {
+    path: 'rooms/new',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/rooms/room-create/room-create.page').then((m) => m.RoomCreatePage),
+  },
+  {
+    path: 'rooms/:roomId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/rooms/room-detail/room-detail.page').then((m) => m.RoomDetailPage),
+  },
   { path: '**', redirectTo: 'home' },
 ];

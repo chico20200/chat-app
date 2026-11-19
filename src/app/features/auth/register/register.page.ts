@@ -6,6 +6,7 @@ import {
 } from '@ionic/angular';
 import { AuthService } from '../../../core/services/auth.service';
 import { authErrorMessage } from '../../../core/utils/auth-errors';
+import { ProfileService } from '../../../core/services/profile.service';   // NUEVO
 
 function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   const password = group.get('password')?.value;
@@ -26,6 +27,7 @@ export class RegisterPage {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+    private readonly profileService = inject(ProfileService);
 
   readonly form = this.fb.nonNullable.group(
     {
@@ -50,6 +52,7 @@ export class RegisterPage {
     this.error.set(null);
     try {
       await this.authService.register(name.trim(), email, password);
+      await this.profileService.createMine(name.trim());  
       await this.router.navigateByUrl('/home', { replaceUrl: true });
     } catch (e) {
       this.error.set(authErrorMessage(e));

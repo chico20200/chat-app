@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
-  IonBackButton, IonBadge, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon,
+  IonBackButton, IonBadge, IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon,
   IonItem, IonLabel, IonList, IonSegment, IonSegmentButton, IonSpinner, IonText, IonTitle, IonToolbar,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { add } from 'ionicons/icons';
-import { Room } from '../../../core/models/room';
+import { add, personAdd } from 'ionicons/icons';
+import { RoomListItem } from '../../../core/models/room';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { RoomService } from '../../../core/services/room.service';
 
 type Tab = 'mine' | 'explore';
@@ -16,8 +17,8 @@ type Tab = 'mine' | 'explore';
   templateUrl: './rooms-list.page.html',
   styleUrls: ['./rooms-list.page.scss'],
   imports: [
-    RouterLink,
-    IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent,
+    RouterLink, AvatarComponent,
+    IonHeader, IonToolbar, IonButtons, IonButton, IonBackButton, IonTitle, IonContent,
     IonSegment, IonSegmentButton, IonLabel, IonList, IonItem, IonBadge,
     IonFab, IonFabButton, IonIcon, IonSpinner, IonText,
   ],
@@ -26,12 +27,12 @@ export class RoomsListPage {
   protected readonly roomService = inject(RoomService);
 
   protected readonly tab = signal<Tab>('mine');
-  protected readonly publicRooms = signal<Room[]>([]);
+  protected readonly publicRooms = signal<RoomListItem[]>([]);
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
 
   constructor() {
-    addIcons({ add });
+    addIcons({ add, personAdd });
   }
 
   ionViewWillEnter(): void {

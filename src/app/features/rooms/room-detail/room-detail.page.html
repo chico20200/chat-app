@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/rooms"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ room()?.name ?? 'Sala' }}</ion-title>
+    <ion-title>{{ title() }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,10 +11,15 @@
   @if (loading()) {
     <div class="ion-text-center"><ion-spinner></ion-spinner></div>
   } @else if (room(); as r) {
-    <ion-badge [color]="r.is_private ? 'medium' : 'success'">{{ r.is_private ? 'Privada' : 'Pública' }}</ion-badge>
+    <ion-badge [color]="r.type === 'direct' ? 'tertiary' : r.is_private ? 'medium' : 'success'">
+      {{ r.type === 'direct' ? 'Chat directo' : r.is_private ? 'Privada' : 'Pública' }}
+    </ion-badge>
     @if (r.description) { <p>{{ r.description }}</p> }
 
     <div class="ion-margin-vertical">
+      @if (isMember()) {
+        <ion-button expand="block" [routerLink]="['/rooms', r.id]">Abrir chat</ion-button>
+      }
       @if (!isMember() && !r.is_private) {
         <ion-button expand="block" (click)="join()" [disabled]="busy()">Unirme</ion-button>
       }

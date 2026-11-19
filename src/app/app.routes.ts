@@ -33,11 +33,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/profile.page').then((m) => m.ProfilePage),
   },
 
-  
-  {
-    path: 'profile',
-    loadComponent: () => import('./features/profile/profile.page').then((m) => m.ProfilePage),
-  },
    {
     path: 'rooms',
     canActivate: [authGuard],
@@ -49,9 +44,19 @@ export const routes: Routes = [
     loadComponent: () => import('./features/rooms/room-create/room-create.page').then((m) => m.RoomCreatePage),
   },
   {
-    path: 'rooms/:roomId',
+    path: 'rooms/direct',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/rooms/direct-new/direct-new.page').then((m) => m.DirectNewPage),
+  },
+  {
+    path: 'rooms/:roomId/info',
     canActivate: [authGuard],
     loadComponent: () => import('./features/rooms/room-detail/room-detail.page').then((m) => m.RoomDetailPage),
+  },
+  {
+    path: 'rooms/:roomId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/chat/chat.page').then((m) => m.ChatPage),
   },
   { path: '**', redirectTo: 'home' },
 ];

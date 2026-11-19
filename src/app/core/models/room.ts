@@ -25,3 +25,7 @@ export interface RoomMember {
   joined_at: string;
   profile: MemberProfile | null;
 }
+export interface RoomListItem extends Room {
+  title: string;
+  avatar_url: string | null;
+}

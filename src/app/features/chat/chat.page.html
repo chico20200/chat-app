@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/rooms"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      {{ title() }}
+      @if (subtitle()) { <div class="subtitle">{{ subtitle() }}</div> }
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/rooms', roomId(), 'info']" aria-label="Información de la sala">
+        <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (loading()) {
+    <div class="ion-text-center"><ion-spinner></ion-spinner></div>
+  } @else if (!room()) {
+    <ion-text color="medium"><p class="ion-text-center">La sala no existe o no tienes acceso.</p></ion-text>
+  } @else if (!isMember()) {
+    <div class="ion-text-center">
+      <p>No eres miembro de esta sala.</p>
+      <ion-button [routerLink]="['/rooms', roomId(), 'info']">Ver sala</ion-button>
+    </div>
+  } @else {
+    @for (m of messages(); track m.id; let i = $index) {
+      <app-message-bubble
+        [message]="m"
+        [mine]="m.authorId === myUid()"
+        [author]="profiles().get(m.authorId) ?? null"
+        [showAuthor]="showAuthor(i)"
+        [mediaUrl]="urlFor(m)"
+        (selected)="onSelect($event)"
+        (openMedia)="openMedia($event)"
+      />
+    } @empty {
+      <ion-text color="medium"><p class="ion-text-center">Aún no hay mensajes. ¡Escribe el primero!</p></ion-text>
+    }
+  }
+
+  @if (error()) {
+    <ion-text color="danger"><p class="ion-text-center">{{ error() }}</p></ion-text>
+  }
+</ion-content>
+
+@if (isMember()) {
+  <ion-footer>
+    <ion-toolbar>
+      <input #imageInput type="file" accept="image/*" hidden (change)="onFilePicked($event, 'image')" />
+      <input
+        #fileInput
+        type="file"
+        accept=".pdf,.txt,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+        hidden
+        (change)="onFilePicked($event, 'file')"
+      />
+      @if (typingText()) {
+        <div class="typing">{{ typingText() }}</div>
+      }
+      @if (uploading()) {
+        <div class="uploading"><ion-spinner name="dots"></ion-spinner> Subiendo archivo…</div>
+      }
+      @if (locating()) {
+        <div class="uploading"><ion-spinner name="dots"></ion-spinner> Obteniendo tu ubicación…</div>
+      }
+      <div class="composer">
+        <ion-button fill="clear" (click)="attach()" [disabled]="uploading() || locating()" aria-label="Adjuntar">
+          <ion-icon slot="icon-only" name="attach"></ion-icon>
+        </ion-button>
+        <ion-textarea
+          placeholder="Escribe un mensaje"
+          [autoGrow]="true"
+          [rows]="1"
+          [maxlength]="maxLength"
+          [value]="draft()"
+          (ionInput)="onDraftInput($event.detail.value ?? '')"
+          (keydown)="onKeydown($event)"
+        ></ion-textarea>
+        <ion-button (click)="send()" [disabled]="!draft().trim() || sending()" aria-label="Enviar">
+          <ion-icon slot="icon-only" name="send"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}

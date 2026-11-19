@@ -4,6 +4,11 @@
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
     <ion-title>Salas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/rooms/direct" aria-label="Nuevo chat">
+        <ion-icon slot="icon-only" name="person-add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
   <ion-toolbar>
     <ion-segment [value]="tab()" (ionChange)="onTabChange($event.detail.value)">
@@ -25,13 +30,14 @@
 
   <ion-list>
     @for (room of rooms; track room.id) {
-      <ion-item [routerLink]="['/rooms', room.id]" detail>
+      <ion-item [routerLink]="tab() === 'mine' ? ['/rooms', room.id] : ['/rooms', room.id, 'info']" detail>
+        <app-avatar slot="start" [src]="room.avatar_url" [name]="room.title" [size]="40" />
         <ion-label>
-          <h2>{{ room.name ?? 'Chat directo' }}</h2>
+          <h2>{{ room.title }}</h2>
           @if (room.description) { <p>{{ room.description }}</p> }
         </ion-label>
-        <ion-badge slot="end" [color]="room.is_private ? 'medium' : 'success'">
-          {{ room.is_private ? 'Privada' : 'Pública' }}
+        <ion-badge slot="end" [color]="room.type === 'direct' ? 'tertiary' : room.is_private ? 'medium' : 'success'">
+          {{ room.type === 'direct' ? 'Directo' : room.is_private ? 'Privada' : 'Pública' }}
         </ion-badge>
       </ion-item>
     } @empty {

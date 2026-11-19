@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/rooms"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Nuevo chat</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Buscar por nombre"
+      [value]="query()"
+      (ionInput)="query.set($event.detail.value ?? '')"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (loading()) {
+    <div class="ion-text-center ion-padding"><ion-spinner></ion-spinner></div>
+  }
+  @if (error()) {
+    <ion-text color="danger"><p class="ion-padding">{{ error() }}</p></ion-text>
+  }
+
+  <ion-list>
+    @for (p of filtered(); track p.id) {
+      <ion-item button (click)="open(p)" [disabled]="opening() !== null">
+        <app-avatar slot="start" [src]="p.avatar_url" [name]="p.display_name" [size]="40" />
+        <ion-label>{{ p.display_name }}</ion-label>
+        @if (opening() === p.id) { <ion-spinner slot="end" name="dots"></ion-spinner> }
+      </ion-item>
+    } @empty {
+      @if (!loading()) {
+        <ion-item lines="none"><ion-label color="medium">No se encontraron personas.</ion-label></ion-item>
+      }
+    }
+  </ion-list>
+</ion-content>

@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   IonBackButton, IonBadge, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel,
   IonList, IonListHeader, IonNote, IonSpinner, IonText, IonTitle, IonToolbar, ToastController,
@@ -14,7 +14,7 @@ import { AvatarComponent } from '../../../shared/components/avatar/avatar.compon
   templateUrl: './room-detail.page.html',
   styleUrls: ['./room-detail.page.scss'],
   imports: [
-    AvatarComponent,
+    AvatarComponent, RouterLink,
     IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonButton,
     IonList, IonListHeader, IonItem, IonLabel, IonNote, IonBadge, IonSpinner, IonText,
   ],
@@ -39,6 +39,14 @@ export class RoomDetailPage {
   protected readonly isOwner = computed(() =>
     this.members().some((m) => m.user_id === this.myUid() && m.role === 'owner'),
   );
+
+  protected readonly title = computed(() => {
+    const room = this.room();
+    if (!room) return 'Sala';
+    if (room.type === 'group') return room.name ?? 'Sala';
+    const other = this.members().find((m) => m.user_id !== this.myUid());
+    return other?.profile?.display_name ?? 'Chat directo';
+  });
 
   constructor() {
     effect(() => {
@@ -66,7 +74,8 @@ export class RoomDetailPage {
   }
 
   protected async join(): Promise<void> {
-    await this.run(() => this.roomService.join(this.roomId()), 'Te uniste a la sala');
+    const ok = await this.run(() => this.roomService.join(this.roomId()), 'Te uniste a la sala');
+    if (ok) await this.router.navigate(['/rooms', this.roomId()], { replaceUrl: true });
   }
 
   protected async leave(): Promise<void> {

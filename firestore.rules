@@ -1,0 +1,80 @@
+rules_version = '2';
+
+// =========================================================
+// Reglas de Firestore — mensajes del chat
+// La lista rooms/{roomId}.members la escribe SOLO la Edge Function "rooms"
+// (Firebase Admin se salta estas reglas). La app nunca puede modificarla.
+// =========================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(roomId) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.members;
+    }
+
+    // Adjunto: la ruta tiene que estar dentro de la carpeta de ESTA sala en el bucket chat-media.
+    function validFile(roomId, f) {
+      return f is map
+        && f.keys().hasOnly(['path', 'name', 'size', 'mime'])
+        && f.path is string && f.path.matches(roomId + '/.+')
+        && f.name is string && f.name.size() > 0 && f.name.size() <= 200
+        && f.size is int && f.size > 0 && f.size <= 10485760
+        && f.mime is string;
+    }
+
+    function validLocation(l) {
+      return l is map
+        && l.keys().hasOnly(['lat', 'lng', 'accuracy'])
+        && l.lat is number && l.lat >= -90 && l.lat <= 90
+        && l.lng is number && l.lng >= -180 && l.lng <= 180
+        && l.accuracy is number && l.accuracy >= 0;
+    }
+
+    function validNewMessage(roomId) {
+      let m = request.resource.data;
+      return m.keys().hasOnly(['authorId', 'type', 'text', 'file', 'location', 'createdAt', 'editedAt', 'deleted'])
+        && m.authorId == request.auth.uid
+        && m.createdAt == request.time
+        && m.editedAt == null
+        && m.deleted == false
+        && m.text is string && m.text.size() <= 2000
+        && (
+          (m.type == 'text' && m.text.size() > 0 && !('file' in m) && !('location' in m))
+          || (m.type == 'image' && validFile(roomId, m.file) && m.file.mime.matches('image/.*'))
+          || (m.type == 'file' && validFile(roomId, m.file))
+          || (m.type == 'location' && validLocation(m.location) && !('file' in m))
+        );
+    }
+
+    function validChange() {
+      let before = resource.data;
+      let after = request.resource.data;
+      return before.authorId == request.auth.uid
+        && before.deleted == false
+        && after.diff(before).affectedKeys().hasOnly(['text', 'editedAt', 'deleted'])
+        && after.editedAt == request.time
+        && after.text is string && after.text.size() <= 2000
+        && (
+          (after.deleted == true && after.text == '')
+          || (after.deleted == false && before.type == 'text' && after.text.size() > 0)
+        );
+    }
+
+    match /rooms/{roomId} {
+      allow read: if isMember(roomId);
+      allow write: if false;
+
+      match /messages/{messageId} {
+        allow read: if isMember(roomId);
+        allow create: if isMember(roomId) && validNewMessage(roomId);
+        allow update: if isMember(roomId) && validChange();
+        allow delete: if false;
+      }
+    }
+  }
+}

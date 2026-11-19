@@ -1,0 +1,33 @@
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.composer ion-textarea {
+  flex: 1;
+  max-height: 120px;
+}
+
+.uploading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 16px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+ion-title .subtitle {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ion-color-success);
+}
+
+.typing {
+  padding: 4px 16px;
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.8;
+}
